@@ -7,7 +7,7 @@ describe('Model Finder Middleware', () => {
     let req = {params:{}};
     let res = {};
     let next = jest.fn();
-    modelFinder(req,res,next)
+    modelFinder(req,res,next);
     expect(next).toHaveBeenCalledWith('Invalid Model');
   });
   it('returns a model object/function when a valid model is requested', () => {

@@ -6,11 +6,20 @@ export default (req, res, next) => {
 
   try {
 
-    let auth = {};
     let authHeader = req.headers.authorization;
+    
+
+    console.log(authHeader);
+
 
     // BASIC Auth
     if(authHeader.match(/basic/i)) {
+
+      let base64Header = authHeader.replace(/Basic\s+/,'');
+      let base64Buffer = Buffer.from(base64Header, 'base64');
+      let bufferString = base64Buffer.toString();
+      let [username,password] = bufferString.split(':');
+      let auth = {username,password};
 
       // Create a {user:password} object to send into the model to authenticate the user
 
@@ -23,6 +32,7 @@ export default (req, res, next) => {
     else if(authHeader.match(/bearer/i)) {
 
       // Send the bearer token to the model to authenticate the user
+      let token = authHeader.replace(/bearer\s+/i, '');
       User.authenticateToken(token)
         .then(user=>_authenticate(user))
         .catch(_authError);
@@ -30,13 +40,17 @@ export default (req, res, next) => {
     else { _authError(); }
 
   } catch(e) {
-    _authError();
+    _authError(e);
   }
 
   function _authenticate(user) {
-    if(!user) { _authError(); }
+    if(!user) {
+      _authError();
+    }
     else {
       // Send the user and token back to the request
+      req.user = user;
+      req.token = user.generateToken();
       next();
     }
   }

@@ -12,7 +12,7 @@ const articles = mongoose.Schema({
   title: { type:String, required:true },
   article: { type:String, required:true},
   author: { type:String, required:true},
-  comments: [comments]
+  comments: [comments],
 });
 
 export default mongoose.model('articles', articles);
